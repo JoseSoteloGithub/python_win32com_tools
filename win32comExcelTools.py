@@ -1,4 +1,5 @@
 def find_nth(haystack_str, needle_str, n_int):
+# Returns index of nth needle in haystack    
     start = haystack_str.find(needle_str)
     while start >= 0 and n_int > 1:
         start = haystack_str.find(needle_str, start+len(needle_str))
