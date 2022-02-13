@@ -5,6 +5,25 @@ def find_nth(haystack_str, needle_str, n_int):
         start = haystack_str.find(needle_str, start+len(needle_str))
         n_int -= 1
     return start
+
+def get_column_index(worksheet_obj, substring_str, header_row_int, worksheet_column_index_dict={}):
+# Returns column letter or -1 if not found
+    try:
+        column_index = worksheet_column_index_dict[substring_str]
+        print('Returned from try: on worksheet_column_index_dict')
+        return column_index
+    except:
+        last_column_letter = get_last_column_letter(worksheet_obj, header_row_int)
+        column_header = worksheet_obj.Range('A' + str(header_row_int) + ':' + last_column_letter + str(header_row_int)).Find(What=substring_str, SearchOrder=constants.xlByRows, 
+                                                        SearchDirection=constants.xlNext)
+
+        if not column_header is None:
+            column_index = column_header.Column
+        else:
+            column_index = -1
+
+        return column_index
+
 def get_column_letter(worksheet_obj, substring_str, header_row_int, worksheet_column_letters_dict={}):
 # Returns column letter or -1 if not found
     try:
@@ -47,7 +66,7 @@ def get_header_row(worksheet_obj, search_string_str):
         header_row = header_range.Row
     else:
         header_row = -1
-    header_row = str(header_row)
+    #header_row = str(header_row)
     return header_row
 def get_list_column_headers(range_to_get_obj):
 # Returns list of column headers in range
@@ -56,3 +75,14 @@ def get_list_column_headers(range_to_get_obj):
     for cell in cols:
         this_list.append(cell.Value)  
     return this_list
+
+def get_workbook(xl, wb_name_str):
+    for i_wb in xl.Workbooks:
+        wb = i_wb
+        if i_wb.Name.find(wb_name_str) > -1:
+            break
+
+    if wb.Name.find(wb_name_str) == -1:
+        sys.exit(f'{wb_name_str} was not found in the Workbook name.  Exiting')
+    
+    return wb
