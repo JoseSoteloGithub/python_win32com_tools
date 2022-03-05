@@ -24,37 +24,32 @@ def find_nth(haystack, needle, n):
         start = haystack.find(needle, start+len(needle))
         n -= 1
     return start
+
 def get_column_letter(worksheet_obj, substring_str, header_row_int, worksheet_column_letters_dict={}):
 # Returns column letter or -1 if not found
-    print('worksheet_obj:', worksheet_obj)
-    print('worksheet_column_letters_dict:', worksheet_column_letters_dict)
     try:
         column_letter = worksheet_column_letters_dict[substring_str]
         print('Returned from try: on worksheet_column_letters_dict')
         return column_letter
     except:
-        last_column_letter = get_last_column_letter(worksheet_obj, header_row_int)
         if header_row_int == 0:
             column_header = worksheet_obj.Cells.Find(What=substring_str, SearchOrder=constants.xlByRows, 
                                                             SearchDirection=constants.xlNext)        
         else:
-            column_header = worksheet_obj.Range('A' + str(header_row_int) + ':' + last_column_letter + str(header_row_int)).Find(What=substring_str, SearchOrder=constants.xlByRows, 
+            column_header = worksheet_obj.Rows(header_row_int).Find(What=substring_str, SearchOrder=constants.xlByRows,
                                                             SearchDirection=constants.xlNext)
 
-        #print('column_header:', column_header)
         if not column_header is None:
             first_dolla = find_nth(column_header.Address, '$', 1)
             second_dolla = find_nth(column_header.Address, '$', 2)
             column_letter = column_header.Address[first_dolla + 1:second_dolla]
         else:
             column_letter = -1
-        #print(f'{worksheet_obj.Parent.Name}.{worksheet_obj.Name}.{substring_str}: ', column_letter)
+
         return column_letter
 
 def get_last_column_letter(worksheet_obj, header_row_int=0):
 # Returns last column letter
-    print('worksheet_obj.Name:', worksheet_obj.Name)
-    print('header_row_int:', header_row_int)
     if header_row_int != 0:
         last_column_letter_address = worksheet_obj.Rows(header_row_int).Find(What='*', SearchOrder=constants.xlByColumns, SearchDirection=constants.xlPrevious).Address
     else:
@@ -87,30 +82,29 @@ def get_last_row(worksheet_obj):
     return(worksheet_obj.Cells.Find(What='*', SearchOrder=constants.xlByRows, SearchDirection=constants.xlPrevious).Row)
 
 def sheet_exist(workbook, string):
-    for ws_target in wb.Worksheets:
+# Returns True if exists
+    for ws_target in workbook.Worksheets:
         if string in ws_target.Name:
             return True
     return False
 
-def create_sheets():
-    # Loop through list of name, check if there's a worksheet for the name, 
-    # if not then copy the main worksheet and paste it at the end, rename it, apply filter for that name
-    for name2 in name2_li:
-        name2_sheet_exist = sheet_exist(wb, name2)
-        if name2_sheet_exist == False:
-            ws.Copy(After=wb.Sheets(len(wb.Worksheets)))
-            wb.Worksheets(len(wb.Worksheets)).Name = name2
-            wb.Worksheets(len(wb.Worksheets)).ListObjects(1).Range.AutoFilter(Field=name2_column_number, Criteria1= \
-            name2)
+def create_sheets(workbook_obj, worksheet_obj, name_li):
+# Loop through list of name, check if there's a worksheet for the name,
+# if not then copy the Active worksheet and paste it at the end, rename it, apply filter for that name
+    for name in name_li:
+        name_sheet_exist = sheet_exist(workbook_obj, name)
+        if name_sheet_exist == False:
+            worksheet_obj.Copy(After=workbook_obj.Sheets(len(workbook_obj.Worksheets)))
+            workbook_obj.Worksheets(len(workbook_obj.Worksheets)).Name = name
 
 def get_dictionary_column_letters(worksheet_obj, column_letters_dict, header_row_int):
 # Return dictionary of column letters dictionary_name['ColumnHeaderString'] = 'ColumnLetter'
 
-    last_column_index = win32comTools.get_last_column_index(worksheet_obj, header_row_int)
+    last_column_index = get_last_column_index(worksheet_obj, header_row_int)
 
     for i in range(1, last_column_index + 1):
         value = worksheet_obj.Range(worksheet_obj.Cells(header_row_int, i), worksheet_obj.Cells(header_row_int, i)).Value
-        column_letters_dict[value] = win32comTools.get_column_letter(worksheet_obj, value, header_row_int, column_letters_dict)
+        column_letters_dict[value] = get_column_letter(worksheet_obj, value, header_row_int, column_letters_dict)
 
     return column_letters_dict
 
