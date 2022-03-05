@@ -103,5 +103,16 @@ def create_sheets():
             wb.Worksheets(len(wb.Worksheets)).ListObjects(1).Range.AutoFilter(Field=name2_column_number, Criteria1= \
             name2)
 
+def get_dictionary_column_letters(worksheet_obj, column_letters_dict, header_row_int):
+# Return dictionary of column letters dictionary_name['ColumnHeaderString'] = 'ColumnLetter'
+
+    last_column_index = win32comTools.get_last_column_index(worksheet_obj, header_row_int)
+
+    for i in range(1, last_column_index + 1):
+        value = worksheet_obj.Range(worksheet_obj.Cells(header_row_int, i), worksheet_obj.Cells(header_row_int, i)).Value
+        column_letters_dict[value] = win32comTools.get_column_letter(worksheet_obj, value, header_row_int, column_letters_dict)
+
+    return column_letters_dict
+
 import win32com.client
 constants = win32com.client.constants
