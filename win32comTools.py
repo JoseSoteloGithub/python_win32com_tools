@@ -62,6 +62,15 @@ def get_last_column_letter(worksheet_obj, header_row_int=0):
     last_column_letter = last_column_letter_address.split('$')[1]
     return(last_column_letter)
 
+def get_last_column_index(worksheet_obj, header_row_int=0):
+# Returns last column as index
+    if header_row_int != 0:
+        last_column_range = worksheet_obj.Rows(header_row_int).Find(What='*', SearchOrder=constants.xlByColumns, SearchDirection=constants.xlPrevious)
+    else:
+        last_column_range = worksheet_obj.Cells.Find(What='*', SearchOrder=constants.xlByColumns, SearchDirection=constants.xlPrevious)
+
+    return(last_column_range.Column)
+
 def get_header_row(worksheet_obj, search_string_str):
 # returns header row as int, -1 if not found
     header_range = worksheet_obj.Rows.Find(What=search_string_str, SearchOrder=constants.xlByRows, 
