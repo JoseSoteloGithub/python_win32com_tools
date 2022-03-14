@@ -48,6 +48,27 @@ def get_column_letter(worksheet_obj, substring_str, header_row_int, worksheet_co
 
         return column_letter
 
+def get_column_number(worksheet_obj, substring_str, header_row_int, worksheet_column_numbers_dict={}):
+    # Returns column number or -1 if not found
+    try:
+        column_number = worksheet_column_numbers_dict[substring_str]
+        print('Returned from try: on worksheet_column_numbers_dict')
+        return column_number
+    except:
+        if header_row_int == 0:
+            column_header = worksheet_obj.Cells.Find(What=substring_str, SearchOrder=constants.xlByRows,
+                                                            SearchDirection=constants.xlNext)
+        else:
+            column_header = worksheet_obj.Rows(header_row_int).Find(What=substring_str, SearchOrder=constants.xlByRows,
+                                                            SearchDirection=constants.xlNext)
+
+        if not column_header is None:
+            column_number = column_header.Column
+        else:
+            column_number = -1
+
+        return column_number    
+    
 def get_last_column_letter(worksheet_obj, header_row_int=0):
 # Returns last column letter
     if header_row_int != 0:
