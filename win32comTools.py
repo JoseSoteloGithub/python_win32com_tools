@@ -87,7 +87,7 @@ def get_last_column_index(worksheet_obj, header_row_int=0):
 
     if last_column_range == None:
         return 1
-    else
+    else:
         return(last_column_range.Column)
 
 def get_header_row(worksheet_obj, search_string_str):
