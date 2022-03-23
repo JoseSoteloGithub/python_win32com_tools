@@ -26,7 +26,7 @@ def find_nth(haystack, needle, n):
     return start
 
 def get_column_letter(worksheet_obj, substring_str, header_row_int, worksheet_column_letters_dict={}):
-# Returns column letter or -1 if not found
+    # Returns column letter or -1 if not found
     try:
         column_letter = worksheet_column_letters_dict[substring_str]
         print('Returned from try: on worksheet_column_letters_dict')
@@ -70,7 +70,7 @@ def get_column_number(worksheet_obj, substring_str, header_row_int, worksheet_co
         return column_number    
     
 def get_last_column_letter(worksheet_obj, header_row_int=0):
-# Returns last column letter
+    # Returns last column letter
     if header_row_int != 0:
         last_column_letter_address = worksheet_obj.Rows(header_row_int).Find(What='*', SearchOrder=constants.xlByColumns, SearchDirection=constants.xlPrevious).Address
     else:
@@ -79,16 +79,19 @@ def get_last_column_letter(worksheet_obj, header_row_int=0):
     return(last_column_letter)
 
 def get_last_column_index(worksheet_obj, header_row_int=0):
-# Returns last column as index
+    # Returns last column as index
     if header_row_int != 0:
         last_column_range = worksheet_obj.Rows(header_row_int).Find(What='*', SearchOrder=constants.xlByColumns, SearchDirection=constants.xlPrevious)
     else:
         last_column_range = worksheet_obj.Cells.Find(What='*', SearchOrder=constants.xlByColumns, SearchDirection=constants.xlPrevious)
 
-    return(last_column_range.Column)
+    if last_column_range == None:
+        return 1
+    else
+        return(last_column_range.Column)
 
 def get_header_row(worksheet_obj, search_string_str):
-# returns header row as int, -1 if not found
+    # returns header row as int, -1 if not found
     header_range = worksheet_obj.Rows.Find(What=search_string_str, SearchOrder=constants.xlByRows, 
                                                         SearchDirection=constants.xlNext)
     if not header_range is None:
@@ -99,19 +102,19 @@ def get_header_row(worksheet_obj, search_string_str):
     return header_row
 
 def get_last_row(worksheet_obj):
-# Returns last row as int
+    # Returns last row as int
     return(worksheet_obj.Cells.Find(What='*', SearchOrder=constants.xlByRows, SearchDirection=constants.xlPrevious).Row)
 
 def sheet_exist(workbook, string):
-# Returns True if exists
+    # Returns True if exists
     for ws_target in workbook.Worksheets:
         if string in ws_target.Name:
             return True
     return False
 
 def create_sheets(workbook_obj, worksheet_obj, name_li):
-# Loop through list of name, check if there's a worksheet for the name,
-# if not then copy the Active worksheet and paste it at the end, rename it, apply filter for that name
+    # Loop through list of name, check if there's a worksheet for the name,
+    # if not then copy the Active worksheet and paste it at the end, rename it, apply filter for that name
     for name in name_li:
         name_sheet_exist = sheet_exist(workbook_obj, name)
         if name_sheet_exist == False:
@@ -119,7 +122,7 @@ def create_sheets(workbook_obj, worksheet_obj, name_li):
             workbook_obj.Worksheets(len(workbook_obj.Worksheets)).Name = name
 
 def get_dictionary_column_letters(worksheet_obj, column_letters_dict, header_row_int):
-# Return dictionary of column letters dictionary_name['ColumnHeaderString'] = 'ColumnLetter'
+    # Return dictionary of column letters dictionary_name['ColumnHeaderString'] = 'ColumnLetter'
 
     last_column_index = get_last_column_index(worksheet_obj, header_row_int)
 
