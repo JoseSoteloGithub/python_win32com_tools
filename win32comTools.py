@@ -86,7 +86,7 @@ def get_last_column_index(worksheet_obj, header_row_int=0):
         last_column_range = worksheet_obj.Cells.Find(What='*', SearchOrder=constants.xlByColumns, SearchDirection=constants.xlPrevious)
 
     if last_column_range == None:
-        return 1
+        return 0
     else:
         return(last_column_range.Column)
 
