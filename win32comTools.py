@@ -1,3 +1,21 @@
+import sys
+import win32com.client
+
+constants = win32com.client.constants
+
+def handle_attribute_error_CLSIDToClassMap(attribute_error_str):
+    # Use this on Attribute Error "has no attribute 'CLSIDToClassMap'"
+    # This error happens when on this call win32com.client.Dispatch()
+    from shutil import rmtree
+
+    first_section_find_str = 'win32com.gen_py.'
+    first_section_index = attribute_error_str.find(first_section_find_str)
+    first_section_index += len(first_section_find_str)
+    second_section_index = attribute_error_str.find('\'', first_section_index)
+    folder_name = attribute_error_str[first_section_index:second_section_index]
+    rmtree(f"{win32com.__gen_path__}\{folder_name}")
+    sys.exit(f'AttributeError detected and path {win32com.__gen_path__}\{folder_name} has been removed.  Restart the program')
+
 def get_range_whole(findString, currentSheet, withinRange=None, afterRange=None):
 
     if len(findString) <= 255:
@@ -131,6 +149,3 @@ def get_dictionary_column_letters(worksheet_obj, column_letters_dict, header_row
         column_letters_dict[value] = get_column_letter(worksheet_obj, value, header_row_int, column_letters_dict)
 
     return column_letters_dict
-
-import win32com.client
-constants = win32com.client.constants
