@@ -116,7 +116,6 @@ def get_header_row(worksheet_obj, search_string_str):
         header_row = header_range.Row
     else:
         header_row = -1
-    header_row = str(header_row)
     return header_row
 
 def get_last_row(worksheet_obj):
