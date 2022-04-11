@@ -110,7 +110,7 @@ def get_last_column_index(worksheet_obj, header_row_int=0):
 
 def get_header_row(worksheet_obj, search_string_str):
     # returns header row as int, -1 if not found
-    header_range = worksheet_obj.Rows.Find(What=search_string_str, SearchOrder=constants.xlByRows, 
+    header_range = worksheet_obj.Rows.Find(What=search_string_str, LookAt=constants.xlWhole, SearchOrder=constants.xlByRows,
                                                         SearchDirection=constants.xlNext)
     if not header_range is None:
         header_row = header_range.Row
@@ -148,3 +148,14 @@ def get_dictionary_column_letters(worksheet_obj, column_letters_dict, header_row
         column_letters_dict[value] = get_column_letter(worksheet_obj, value, header_row_int, column_letters_dict)
 
     return column_letters_dict
+
+def get_dictionary_column_indices(worksheet_obj, column_indices_dict, header_row_int):
+    # Return dictionary of column numbers dictionary_name['ColumnHeaderString'] = 'ColumnLetter'
+
+    last_column_index = get_last_column_index(worksheet_obj, header_row_int)
+
+    for i in range(1, last_column_index + 1):
+        value = worksheet_obj.Range(worksheet_obj.Cells(header_row_int, i), worksheet_obj.Cells(header_row_int, i)).Value
+        column_indices_dict[value] = get_column_number(worksheet_obj, value, header_row_int, column_indices_dict)
+
+    return column_indices_dict
