@@ -159,3 +159,12 @@ def get_dictionary_column_indices(worksheet_obj, column_indices_dict, header_row
         column_indices_dict[value] = get_column_number(worksheet_obj, value, header_row_int, column_indices_dict)
 
     return column_indices_dict
+
+def show_all_data_from_sheet(ws):
+
+    ws.Cells.EntireRow.Hidden = False
+    
+    ws.Cells.EntireColumn.Hidden = False
+    
+    if (ws.AutoFilterMode and ws.FilterMode) or ws.FilterMode:
+        ws.ShowAllData()  
