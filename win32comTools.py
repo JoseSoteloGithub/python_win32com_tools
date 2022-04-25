@@ -120,7 +120,14 @@ def get_header_row(worksheet_obj, search_string_str):
 
 def get_last_row(worksheet_obj):
     # Returns last row as int
-    return(worksheet_obj.Cells.Find(What='*', SearchOrder=constants.xlByRows, SearchDirection=constants.xlPrevious).Row)
+    last_row_range = worksheet_obj.Cells.Find(What='*', SearchOrder=constants.xlByRows, SearchDirection=constants.xlPrevious)
+
+    if last_row_range is None:
+        last_row = 1
+    else:
+        last_row = last_row_range.Row
+
+    return last_row
 
 def sheet_exist(workbook, string):
     # Returns True if exists
