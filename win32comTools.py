@@ -3,6 +3,12 @@ import win32com.client
 
 constants = win32com.client.constants
 
+def handle_type_error_com_can_not_automate_makepy(type_error_str):
+
+    response = win32api.MessageBox(0, "Currently selected in a cell in Excel, click off and retry", "Complete")
+
+    sys.exit()
+
 def handle_attribute_error_CLSIDToClassMap(attribute_error_str):
     # Use this on Attribute Error "has no attribute 'CLSIDToClassMap'"
     # This error happens when on this call win32com.client.Dispatch()
