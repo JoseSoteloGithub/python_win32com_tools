@@ -181,3 +181,8 @@ def show_all_data_from_sheet(ws):
     
     if (ws.AutoFilterMode and ws.FilterMode) or ws.FilterMode:
         ws.ShowAllData()  
+
+def get_filename_from_full_filename(full_filename):
+    # Returns the file name from a path
+    last_backslash_index = full_filename.rfind('\\')
+    return full_filename[last_backslash_index + 1:]        
