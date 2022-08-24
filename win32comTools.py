@@ -58,10 +58,10 @@ def get_column_letter(worksheet_obj, substring_str, header_row_int, worksheet_co
     except:
         if header_row_int == 0:
             column_header = worksheet_obj.Cells.Find(What=substring_str, SearchOrder=constants.xlByRows, 
-                                                            SearchDirection=constants.xlNext)        
+                                                            SearchDirection=constants.xlNext, LookAt=constants.xlWhole)
         else:
             column_header = worksheet_obj.Rows(header_row_int).Find(What=substring_str, SearchOrder=constants.xlByRows,
-                                                            SearchDirection=constants.xlNext)
+                                                            SearchDirection=constants.xlNext, LookAt=constants.xlWhole)
 
         if not column_header is None:
             first_dolla = find_nth(column_header.Address, '$', 1)
@@ -81,10 +81,10 @@ def get_column_number(worksheet_obj, substring_str, header_row_int, worksheet_co
     except:
         if header_row_int == 0:
             column_header = worksheet_obj.Cells.Find(What=substring_str, SearchOrder=constants.xlByRows,
-                                                            SearchDirection=constants.xlNext)
+                                                            SearchDirection=constants.xlNext, LookAt=constants.xlWhole)
         else:
             column_header = worksheet_obj.Rows(header_row_int).Find(What=substring_str, SearchOrder=constants.xlByRows,
-                                                            SearchDirection=constants.xlNext)
+                                                            SearchDirection=constants.xlNext, LookAt=constants.xlWhole)
 
         if not column_header is None:
             column_number = column_header.Column
