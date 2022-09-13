@@ -95,7 +95,7 @@ def get_column_number(worksheet_obj, substring_str, header_row_int, worksheet_co
     
 def get_last_column_letter(worksheet_obj, header_row_int=0):
     # Returns last column letter
-    if header_row_int != 0:
+    if header_row_int > 0:
         last_column_letter_address = worksheet_obj.Rows(header_row_int).Find(What='*', SearchOrder=constants.xlByColumns, SearchDirection=constants.xlPrevious).Address
     else:
         last_column_letter_address = worksheet_obj.Cells.Find(What='*', SearchOrder=constants.xlByColumns, SearchDirection=constants.xlPrevious).Address
@@ -104,7 +104,7 @@ def get_last_column_letter(worksheet_obj, header_row_int=0):
 
 def get_last_column_index(worksheet_obj, header_row_int=0):
     # Returns last column as index
-    if header_row_int != 0:
+    if header_row_int > 0:
         last_column_range = worksheet_obj.Rows(header_row_int).Find(What='*', SearchOrder=constants.xlByColumns, SearchDirection=constants.xlPrevious)
     else:
         last_column_range = worksheet_obj.Cells.Find(What='*', SearchOrder=constants.xlByColumns, SearchDirection=constants.xlPrevious)
