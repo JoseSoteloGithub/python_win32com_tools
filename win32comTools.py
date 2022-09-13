@@ -93,26 +93,41 @@ def get_column_number(worksheet_obj, substring_str, header_row_int, worksheet_co
 
         return column_number    
     
-def get_last_column_letter(worksheet_obj, header_row_int=0):
+def get_last_column_range(worksheet_obj: object, header_row_int=0):
+    if header_row_int > 0:
+        last_column_range = worksheet_obj.Rows(header_row_int).Find(What='*', SearchOrder=constants.xlByColumns,
+                                                                    SearchDirection=constants.xlPrevious)
+    else:
+        last_column_range = worksheet_obj.Cells.Find(What='*', SearchOrder=constants.xlByColumns,
+                                                     SearchDirection=constants.xlPrevious)
+    while last_column_range.Offset(1, 2).Value is not None:
+        last_column_range = last_column_range.Offset(1, 2)
+
+    return last_column_range
+
+
+def get_last_column_letter(worksheet_obj: object, header_row_int=0) -> str:
     # Returns last column letter
-    if header_row_int > 0:
-        last_column_letter_address = worksheet_obj.Rows(header_row_int).Find(What='*', SearchOrder=constants.xlByColumns, SearchDirection=constants.xlPrevious).Address
-    else:
-        last_column_letter_address = worksheet_obj.Cells.Find(What='*', SearchOrder=constants.xlByColumns, SearchDirection=constants.xlPrevious).Address
-    last_column_letter = last_column_letter_address.split('$')[1]
-    return(last_column_letter)
 
-def get_last_column_index(worksheet_obj, header_row_int=0):
+    last_column_range = get_last_column_range(worksheet_obj, header_row_int)
+
+    if last_column_range.Value is None:
+        last_column_letter = None
+    else:
+        last_column_letter = last_column_range.Address.split('$')[1]
+
+    return last_column_letter
+
+
+def get_last_column_index(worksheet_obj: object, header_row_int=0) -> int:
     # Returns last column as index
-    if header_row_int > 0:
-        last_column_range = worksheet_obj.Rows(header_row_int).Find(What='*', SearchOrder=constants.xlByColumns, SearchDirection=constants.xlPrevious)
-    else:
-        last_column_range = worksheet_obj.Cells.Find(What='*', SearchOrder=constants.xlByColumns, SearchDirection=constants.xlPrevious)
 
-    if last_column_range == None:
+    last_column_range = get_last_column_range(worksheet_obj, header_row_int)
+
+    if last_column_range.Value is None:
         return 0
     else:
-        return(last_column_range.Column)
+        return last_column_range.Column
 
 def get_header_row(worksheet_obj, search_string_str):
     # returns header row as int, -1 if not found
