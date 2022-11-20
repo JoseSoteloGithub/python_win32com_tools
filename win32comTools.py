@@ -201,3 +201,13 @@ def get_filename_from_full_filename(full_filename):
     # Returns the file name from a path
     last_backslash_index = full_filename.rfind('\\')
     return full_filename[last_backslash_index + 1:]        
+
+def get_open_workbook(wb_name_w_o_extension: str, xl: object) -> object:
+    # Returns a workbook object or None if a workbook is named the same as argument wb_name_w_o_extension
+    for target_wb in xl.Workbooks:
+        target_wb_name = target_wb.Name
+        target_wb_w_o_extension_period_index = find_nth(target_wb_name, '.', -1)
+        target_wb_w_o_extension = target_wb_name[:target_wb_w_o_extension_period_index]
+        if target_wb_w_o_extension.upper() == wb_name_w_o_extension.upper():
+            return target_wb
+    return None
