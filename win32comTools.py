@@ -1,5 +1,6 @@
 import sys
 import win32com.client
+import win32api
 
 constants = win32com.client.constants
 
@@ -179,7 +180,6 @@ def get_dictionary_column_letters(worksheet_obj, column_letters_dict, header_row
 
 def get_dictionary_column_indices(worksheet_obj, column_indices_dict, header_row_int):
     # Return dictionary of column numbers dictionary_name['ColumnHeaderString'] = 'ColumnLetter'
-
     last_column_index = get_last_column_index(worksheet_obj, header_row_int)
 
     for i in range(1, last_column_index + 1):
@@ -188,8 +188,8 @@ def get_dictionary_column_indices(worksheet_obj, column_indices_dict, header_row
 
     return column_indices_dict
 
-def show_all_data_from_sheet(ws):
-
+def show_all_data_from_sheet(ws: object) -> None:
+    # Shows all data in worksheet, unhides columns and rows, then clears filter
     ws.Cells.EntireRow.Hidden = False
     
     ws.Cells.EntireColumn.Hidden = False
@@ -197,17 +197,38 @@ def show_all_data_from_sheet(ws):
     if (ws.AutoFilterMode and ws.FilterMode) or ws.FilterMode:
         ws.ShowAllData()  
 
-def get_filename_from_full_filename(full_filename):
+    return None
+
+def get_wb_name_w_o_extension(filename: str) -> str:
+    # Returns the file name without the extension
+    wb_w_o_extension_period_index: int = find_nth(filename, '.', -1)
+    wb_w_o_extension: str = filename[:wb_w_o_extension_period_index]
+    return wb_w_o_extension
+
+def get_filename_from_full_filename(full_filename: str) -> str:
     # Returns the file name from a path
-    last_backslash_index = full_filename.rfind('\\')
+    last_backslash_index: int = full_filename.rfind('\\')
     return full_filename[last_backslash_index + 1:]        
 
 def get_open_workbook(wb_name_w_o_extension: str, xl: object) -> object:
-    # Returns a workbook object or None if a workbook is named the same as argument wb_name_w_o_extension
+    # Returns a workbook object or None if a workbook is not named the same as argument wb_name_w_o_extension
+    target_wb: object
     for target_wb in xl.Workbooks:
-        target_wb_name = target_wb.Name
-        target_wb_w_o_extension_period_index = find_nth(target_wb_name, '.', -1)
-        target_wb_w_o_extension = target_wb_name[:target_wb_w_o_extension_period_index]
+        target_wb_name: str = target_wb.Name
+        target_wb_w_o_extension_period_index: int = find_nth(target_wb_name, '.', -1)
+        target_wb_w_o_extension: str = target_wb_name[:target_wb_w_o_extension_period_index]
         if target_wb_w_o_extension.upper() == wb_name_w_o_extension.upper():
             return target_wb
     return None
+
+def get_open_workbook_or_openit(wb_full_filename: str, xl: object) -> object:
+    # Returns a workbook object or None if the workbook is not open or not in the provided path
+    wb_filename: str = get_filename_from_full_filename(wb_full_filename)
+    wb_name_w_o_extension:str = get_wb_name_w_o_extension(wb_filename)
+    wb: object = get_open_workbook(wb_name_w_o_extension, xl)
+    if wb is None:
+        wb: object = xl.Workbooks.Open(wb_full_filename)
+    if wb is None:
+        win32api.MessageBox(0, f"{wb_name_w_o_extension} workbook was not found at {wb_full_filename}.  Exiting", "Workbook not found")
+        return None
+    return wb
