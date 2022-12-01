@@ -232,3 +232,29 @@ def get_open_workbook_or_openit(wb_full_filename: str, xl: object) -> object:
         win32api.MessageBox(0, f"{wb_name_w_o_extension} workbook was not found at {wb_full_filename}.  Exiting", "Workbook not found")
         return None
     return wb
+
+def get_dict_li_from_range(target_range: object) -> dict:
+    # Returns a list of dictionaries made of strings where the Key is the column and the Values are the values from the cells
+    # Returns a strings only to avoid the complexity of dates
+    # target_range is an Excel range object, target_range examples...
+    # Example0: target_range = thisworksheet.Range("A1:Z27")
+    # Example1: target_range = thisworksheet.Range(thisworksheet.Cells(1, 1), thisworksheet.Cells(this_last_row, this_last_column_index))
+    table_value: tuple = target_range.Value
+
+    table_dict_li: list = []
+
+    table_key_li: list = list(table_value[0])
+
+    import pywintypes
+    import datetime
+
+    for i in range(1, len(table_value)):
+        this_dict: dict = {}
+        
+        for i_key, key in enumerate(table_key_li):
+            element: object = table_value[i][i_key]
+            this_dict[key]: str = str(element)
+
+        table_dict_li.append(this_dict)
+
+    return table_dict_li    
