@@ -258,3 +258,7 @@ def get_dict_li_from_range(target_range: object) -> dict:
         table_dict_li.append(this_dict)
 
     return table_dict_li    
+
+def get_range_from_int_args(target_ws: object, start_row: int, start_column: int, end_row: int, end_column: int) -> object:
+    # Returns a Range object, simplifies having to type the target_ws 3X
+    return target_ws.Range(target_ws.Cells(start_row, start_column), target_ws.Cells(end_row, end_column))    
