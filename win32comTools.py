@@ -113,6 +113,18 @@ def find_nth(haystack, needle, n):
         n -= 1
     return start
 
+def find_nth_last(haystack, needle, n):
+    # First, reverse the haystack and needle strings
+    haystack = haystack[::-1]
+    needle = needle[::-1]
+    # Then, use the find_nth() function to find the nth occurrence
+    # of the reversed needle in the reversed haystack
+    index = find_nth(haystack, needle, n)
+    # If the index was found, reverse it to get the index in the original string
+    if index >= 0:
+        index = len(haystack) - index - len(needle)
+    return index
+
 
 def get_column_letter(
     worksheet_obj, substring_str, header_row_int, worksheet_column_letters_dict={}
@@ -314,10 +326,18 @@ def show_all_data_from_sheet(ws: object) -> None:
 
     return None
 
+def get_path_from_full_filename(full_filename: str) -> str:
+    # Returns the path from a full_filename
+    last_backslash_index: int = full_filename.rfind("\\")
+    if last_backslash_index < 0:
+        last_backslash_index: int = full_filename.rfind("/")
+    if full_filename.rfind("/") > last_backslash_index:
+        last_backslash_index = full_filename.rfind("/")
+    return full_filename[:last_backslash_index + 1]
 
 def get_wb_name_w_o_extension(filename: str) -> str:
     # Returns the file name without the extension
-    wb_w_o_extension_period_index: int = find_nth(filename, ".", -1)
+    wb_w_o_extension_period_index: int = find_nth_last(filename, ".", -1)
     wb_w_o_extension: str = filename[:wb_w_o_extension_period_index]
     return wb_w_o_extension
 
@@ -325,6 +345,8 @@ def get_wb_name_w_o_extension(filename: str) -> str:
 def get_filename_from_full_filename(full_filename: str) -> str:
     # Returns the file name from a path
     last_backslash_index: int = full_filename.rfind("\\")
+    if last_backslash_index < 0:
+        last_backslash_index: int = full_filename.rfind("/")
     return full_filename[last_backslash_index + 1 :]
 
 
@@ -333,6 +355,7 @@ def get_open_workbook(wb_name_w_o_extension: str, excel_session: object) -> obje
     target_wb: object
     for target_wb in excel_session.Workbooks:
         target_wb_name: str = target_wb.Name
+        print(target_wb_name)
         target_wb_w_o_extension_period_index: int = find_nth(target_wb_name, ".", -1)
         target_wb_w_o_extension: str = target_wb_name[
             :target_wb_w_o_extension_period_index
@@ -428,7 +451,9 @@ def get_excel_session() -> object:
     except Exception as exception:
         if "Operation unavailable" in str(exception):
             excel_session: object = win32com.client.Dispatch("Excel.Application")
+    excel_session.Visible = True
     return excel_session
+
 
 def get_excel_turbo_mode(excel_session: object, engaged_bool: bool) -> object:
     if engaged_bool:
@@ -444,15 +469,43 @@ def get_excel_turbo_mode(excel_session: object, engaged_bool: bool) -> object:
 
     return None   
 
+def get_outlook_session() -> object:
+    try:
+        # Attach to existing Outlook session if available
+        outlook_session = win32com.client.GetActiveObject("Outlook.Application")
+    except Exception as exception:
+        if "Operation unavailable" in str(exception):
+            outlook_session: object = win32com.client.Dispatch("Outlook.Application")
+    outlook_session.Visible = True
+    return outlook_session    
+
+
+def get_field(target_search_str: str, begin_search_str: str, after_search_str: str, offset=0) -> str:
+    # Returns the string in between begin_search_str and after_search_str from target_search_str
+    # offset is set to 0, can be used to adjust where the field_after begins to search
+    field_before: int = target_search_str.find(begin_search_str)
+    field_after: int = target_search_str.find(
+        after_search_str, field_before + len(begin_search_str) + offset)
+    return target_search_str[field_before + len(begin_search_str):field_after]
+
+
 # This is more of a JSON thing than an excel thing
 def save_list_of_dict_as_json(li: list, save_name: str) -> None:
     # Saves list of dictionaries as text file
     import json
 
     with open(f"{save_name}.json", "w") as convert_file:
-        convert_file.write(json.dumps(li))
+        convert_file.write(json.dumps(li, indent=4))
     return None
 
+def get_json(path):
+    # Opens a json file, returns whatever it is, a list of dictionaries or a dictionary
+    import json
+
+    with open(path, "r") as f:
+        return_list_or_dict = json.loads(f.read())
+    
+    return return_list_or_dict
 
 # Not directly related, dynamic operations
 def dynamic_operator(a, relate_operator: str, b) -> bool:
