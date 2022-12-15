@@ -52,6 +52,7 @@ def handle_type_error_com_can_not_automate_makepy(type_error_str):
 def handle_attribute_error_CLSIDToClassMap(attribute_error_str):
     # Use this on Attribute Error "has no attribute 'CLSIDToClassMap'"
     # This error happens when on this call win32com.client.Dispatch()
+    # Deletes the folder that needs to be removed
     from shutil import rmtree
 
     first_section_find_str = "win32com.gen_py."
@@ -470,14 +471,38 @@ def get_excel_turbo_mode(excel_session: object, engaged_bool: bool) -> object:
     return None   
 
 def get_outlook_session() -> object:
+    """
+    Retrieve an instance of the Outlook application.
+    If an instance is already running, return a reference to it.
+    If no instance is running, create a new instance.
+    """
     try:
-        # Attach to existing Outlook session if available
+        # Try to retrieve an existing instance of the Outlook application
         outlook_session = win32com.client.GetActiveObject("Outlook.Application")
     except Exception as exception:
+        # Handle errors that occur when trying to retrieve the Outlook application
         if "Operation unavailable" in str(exception):
-            outlook_session: object = win32com.client.Dispatch("Outlook.Application")
+            try:
+                # If the error is "Operation unavailable", try creating a new instance of the application
+                outlook_session: object = win32com.client.Dispatch("Outlook.Application")
+            except Exception as exception0:
+                # If creating a new instance fails, try using the EnsureDispatch method
+                outlook = win32com.client.gencache.EnsureDispatch('Outlook.Application')
+                if "has no attribute 'CLSIDToClassMap'" in str(exception0):
+                    # If the EnsureDispatch method fails, display an error message and handle the error
+                    win32api.MessageBox(0, "CLSIDToPackageMap Error.  Closing down.  Retry", "Complete")
+                    handle_attribute_error_CLSIDToClassMap(str(exception0))
+                    return None
+        if "has no attribute 'CLSIDToClassMap'" in str(exception):
+            # If the original attempt to retrieve the Outlook application failed, display an error message and handle the error
+            win32api.MessageBox(0, "CLSIDToPackageMap Error.  Closing down.  Retry", "Complete")
+            handle_attribute_error_CLSIDToClassMap(str(exception0))
+            return None
+    # Set the Outlook application to be visible
     outlook_session.Visible = True
-    return outlook_session    
+    # Return the instance of the Outlook application
+    return outlook_session
+
 
 
 def get_field(target_search_str: str, begin_search_str: str, after_search_str: str, offset=0) -> str:
