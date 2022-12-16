@@ -635,3 +635,32 @@ def get_dict_li_from_key_relation(relation_destination_to_target_dict: dict, tar
         return_list.append(return_dict)
 
     return return_list
+
+
+def bin_packing(items, bin_sizes):
+    # Create an empty solution dictionary
+    solution = {}
+    
+    # Sort the items in decreasing order of size
+    sorted_items = sorted(items.items(), key=lambda x: x[1], reverse=True)
+    
+    # Iterate through the sorted list of items
+    for item, size in sorted_items:
+        # Check if the item fits into any of the available bins
+        fits = False
+        for bin, space in bin_sizes.items():
+            if size <= space:
+                # If the item fits, add it to the solution and update the available space in the bin
+                if bin not in solution:
+                    solution[bin] = {}
+                solution[bin][item] = size
+                bin_sizes[bin] -= size
+                fits = True
+                break
+        # If the item does not fit into any of the available bins, create a bin and add the item to it
+        if not fits:
+            new_bin = "DOESNOTFITbin" + str(len(bin_sizes))
+            solution[new_bin] = {item: size}
+            bin_sizes[new_bin] = size
+    
+    return solution
