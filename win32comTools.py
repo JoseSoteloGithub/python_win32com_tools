@@ -636,6 +636,12 @@ def get_dict_li_from_key_relation(relation_destination_to_target_dict: dict, tar
 
     return return_list
 
+def message_box_and_sound(message: str, title: str) -> None:
+    import win32con
+    import win32api
+
+    win32api.MessageBeep(win32con.MB_ICONEXCLAMATION)
+    win32api.MessageBox(0, message, title)
 
 def bin_packing(items, bin_sizes):
     # Create an empty solution dictionary
