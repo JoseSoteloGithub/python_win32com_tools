@@ -446,13 +446,46 @@ def ws_to_json(workbook: object, ws_dict: dict) -> None:
 
 
 def get_excel_session() -> object:
+    # Returns excel_session or None
     try:
         # Attach to existing Excel session if available
         excel_session = win32com.client.GetActiveObject("Excel.Application")
     except Exception as exception:
         if "Operation unavailable" in str(exception):
-            excel_session: object = win32com.client.Dispatch("Excel.Application")
-    excel_session.Visible = True
+            try:
+                # If the error is "Operation unavailable", try creating a new instance of the application
+                excel_session: object = win32com.client.Dispatch("Excel.Application")
+            except Exception as exception0:
+                # If creating a new instance fails, try using the EnsureDispatch method
+                excel_session = win32com.client.gencache.EnsureDispatch('Excel.Application')
+                if "has no attribute 'CLSIDToClassMap'" in str(exception0):
+                    # If the EnsureDispatch method fails, display an error message and handle the error
+                    message_box_and_sound(F"CLSIDToPackageMap Error.  Closing down.  Retry.\n{str(exception0)}", "ERROR DETECTED")
+                    handle_attribute_error_CLSIDToClassMap(str(exception0))
+                    return None
+        if "has no attribute 'CLSIDToClassMap'" in str(exception):
+            # If the original attempt to retrieve the application failed, display an error message and handle the error
+            message_box_and_sound(F"CLSIDToPackageMap Error.  Closing down.  Retry.\n{str(exception)}", "ERROR DETECTED")
+            handle_attribute_error_CLSIDToClassMap(str(exception))
+            return None
+    try: 
+        excel_session.Visible = True
+    except Exception as exception:
+        if "Property 'Excel.Application.Visible' can not be set." in str(exception):
+            try:
+                excel_session_workbook_len = len(excel_session.Workbooks)
+            except Exception as exception0:
+                if "Excel.Application.Workbooks" in str(exception0):
+                    message_box_and_sound(f"AttributeError.  Unable to get len(excel_session.Workbooks).\nCtrl+Alt+Delete > Task Manager > Scroll Down to: Background Processes > close ghost Excel session\n{str(exception0)}",  "ERROR DETECTED")
+                    return None
+
+    try:
+        constants_xlByRows = constants.xlByRows
+    except Exception as exception:
+        if 'xlByRows' in str(exception):
+            excel_session = win32com.client.gencache.EnsureDispatch('Excel.Application')
+            message_box_and_sound(f"AttributeError.  Unable to get constants.xlByRows.\nLet the program continue and retry from the beginning if it doesn't work, you don't have to close Excel\n{str(exception)}",  "ERROR DETECTED")
+
     return excel_session
 
 
