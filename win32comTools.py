@@ -532,7 +532,10 @@ def get_outlook_session() -> object:
             handle_attribute_error_CLSIDToClassMap(str(exception0))
             return None
     # Set the Outlook application to be visible
-    outlook_session.Visible = True
+    try:
+        outlook_session.Visible = True
+    except AttributeError:
+        pass
     # Return the instance of the Outlook application
     return outlook_session
 
