@@ -556,7 +556,7 @@ def save_list_of_dict_as_json(li: list, save_name: str) -> None:
     import json
 
     with open(f"{save_name}.json", "w") as convert_file:
-        convert_file.write(json.dumps(li, indent=4))
+        convert_file.write(json.dumps(li, indent=4, default=str))
     return None
 
 def get_json(path):
