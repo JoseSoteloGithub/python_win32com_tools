@@ -206,8 +206,9 @@ def get_last_column_range(worksheet_obj: object, header_row_int=0):
             SearchOrder=constants.xlByColumns,
             SearchDirection=constants.xlPrevious,
         )
-    while last_column_range.Offset(1, 2).Value is not None:
-        last_column_range = last_column_range.Offset(1, 2)
+    if last_column_range:
+        while last_column_range.Offset(1, 2).Value is not None:
+            last_column_range = last_column_range.Offset(1, 2)
 
     return last_column_range
 
