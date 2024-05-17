@@ -61,6 +61,7 @@ def handle_attribute_error_CLSIDToClassMap(attribute_error_str):
     second_section_index = attribute_error_str.find("'", first_section_index)
     folder_name = attribute_error_str[first_section_index:second_section_index]
     rmtree(f"{win32com.__gen_path__}\{folder_name}")
+    message_box_and_sound(f"AttributeError detected and path {win32com.__gen_path__}\{folder_name} has been removed.  Restart the program")
     sys.exit(
         f"AttributeError detected and path {win32com.__gen_path__}\{folder_name} has been removed.  Restart the program"
     )
@@ -206,9 +207,8 @@ def get_last_column_range(worksheet_obj: object, header_row_int=0):
             SearchOrder=constants.xlByColumns,
             SearchDirection=constants.xlPrevious,
         )
-    if last_column_range:
-        while last_column_range.Offset(1, 2).Value is not None:
-            last_column_range = last_column_range.Offset(1, 2)
+    while last_column_range.Offset(1, 2).Value is not None:
+        last_column_range = last_column_range.Offset(1, 2)
 
     return last_column_range
 
@@ -324,7 +324,15 @@ def show_all_data_from_sheet(ws: object) -> None:
     ws.Cells.EntireColumn.Hidden = False
 
     if (ws.AutoFilterMode and ws.FilterMode) or ws.FilterMode:
-        ws.ShowAllData()
+        try:
+            ws.ShowAllData()
+        except Exception as this_exception:
+            str_exception = str(this_exception)
+            if 'ShowAllData method of Worksheet class failed' in str_exception:
+                alert_str = f'Error: ShowAllData method of Worksheet class failed.  Target Worksheet: {ws.Name}, Parent Workbook: {ws.Parent.Name}'
+                message_box_and_sound(alert_str, 'ERROR ON SHOW ALL DATA')
+                pass
+                # sys.exit(alert_str)
 
     return None
 
@@ -483,9 +491,10 @@ def get_excel_session() -> object:
     try:
         constants_xlByRows = constants.xlByRows
     except Exception as exception:
+        print(str(exception))
         if 'xlByRows' in str(exception):
             excel_session = win32com.client.gencache.EnsureDispatch('Excel.Application')
-            message_box_and_sound(f"AttributeError.  Unable to get constants.xlByRows.\nLet the program continue and retry from the beginning if it doesn't work, you don't have to close Excel\n{str(exception)}",  "ERROR DETECTED")
+            message_box_and_sound(f"AttributeError.  Unable to get constants.xlByRows.\nJust retry from the beginning, you don't have to close Excel\n{str(exception)}",  "ERROR DETECTED")
 
     return excel_session
 
@@ -537,6 +546,7 @@ def get_outlook_session() -> object:
         outlook_session.Visible = True
     except AttributeError:
         pass
+
     # Return the instance of the Outlook application
     return outlook_session
 
@@ -680,30 +690,30 @@ def message_box_and_sound(message: str, title: str) -> None:
     win32api.MessageBeep(win32con.MB_ICONEXCLAMATION)
     win32api.MessageBox(0, message, title)
 
-def bin_packing(items, bin_sizes):
-    # Create an empty solution dictionary
-    solution = {}
+def bin_sort_pack(items, bin_sizes):
+    # Solution dictionary
+    solution_dict = {}
     
     # Sort the items in decreasing order of size
     sorted_items = sorted(items.items(), key=lambda x: x[1], reverse=True)
     
     # Iterate through the sorted list of items
     for item, size in sorted_items:
-        # Check if the item fits into any of the available bins
+        # Item fits into available bins
         fits = False
         for bin, space in bin_sizes.items():
             if size <= space:
                 # If the item fits, add it to the solution and update the available space in the bin
-                if bin not in solution:
-                    solution[bin] = {}
-                solution[bin][item] = size
+                if bin not in solution_dict:
+                    solution_dict[bin] = {}
+                solution_dict[bin][item] = size
                 bin_sizes[bin] -= size
                 fits = True
                 break
         # If the item does not fit into any of the available bins, create a bin and add the item to it
         if not fits:
             new_bin = "DOESNOTFITbin" + str(len(bin_sizes))
-            solution[new_bin] = {item: size}
+            solution_dict[new_bin] = {item: size}
             bin_sizes[new_bin] = size
     
-    return solution
+    return solution_dict
