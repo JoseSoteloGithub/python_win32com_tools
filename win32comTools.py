@@ -61,7 +61,7 @@ def handle_attribute_error_CLSIDToClassMap(attribute_error_str):
     second_section_index = attribute_error_str.find("'", first_section_index)
     folder_name = attribute_error_str[first_section_index:second_section_index]
     rmtree(f"{win32com.__gen_path__}\{folder_name}")
-    message_box_and_sound(f"AttributeError detected and path {win32com.__gen_path__}\{folder_name} has been removed.  Restart the program")
+    message_box_and_sound(f"AttributeError detected and path {win32com.__gen_path__}\{folder_name} has been removed.  Restart the program", "handle_attribute_error_CLSIDToClassMap")
     sys.exit(
         f"AttributeError detected and path {win32com.__gen_path__}\{folder_name} has been removed.  Restart the program"
     )
@@ -539,7 +539,7 @@ def get_outlook_session() -> object:
         if "has no attribute 'CLSIDToClassMap'" in str(exception):
             # If the original attempt to retrieve the Outlook application failed, display an error message and handle the error
             win32api.MessageBox(0, "CLSIDToPackageMap Error.  Closing down.  Retry", "Complete")
-            handle_attribute_error_CLSIDToClassMap(str(exception0))
+            handle_attribute_error_CLSIDToClassMap(str(exception))
             return None
     # Set the Outlook application to be visible
     try:
