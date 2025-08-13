@@ -365,7 +365,6 @@ def get_open_workbook(wb_name_w_o_extension: str, excel_session: object) -> obje
     target_wb: object
     for target_wb in excel_session.Workbooks:
         target_wb_name: str = target_wb.Name
-        print(target_wb_name)
         target_wb_w_o_extension_period_index: int = find_nth(target_wb_name, ".", -1)
         target_wb_w_o_extension: str = target_wb_name[
             :target_wb_w_o_extension_period_index
