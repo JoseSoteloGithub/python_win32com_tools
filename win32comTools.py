@@ -162,15 +162,37 @@ def get_column_letter(
 
         return column_letter
 
+def get_column_number_by_part(
+            worksheet_obj: object, substring_str: str, header_row: int) -> int:
+    # Returns column number or -1 if not found
+    if header_row == 0:
+        column_header = worksheet_obj.Cells.Find(
+            What=substring_str,
+            SearchOrder=constants.xlByRows,
+            SearchDirection=constants.xlNext,
+            LookAt=constants.xlPart,
+        )
+    else:
+        column_header = worksheet_obj.Rows(header_row).Find(
+            What=substring_str,
+            SearchOrder=constants.xlByRows,
+            SearchDirection=constants.xlNext,
+            LookAt=constants.xlPart,
+        )
+    if not column_header is None:
+        column_number = column_header.Column
+    else:
+        column_number = -1
+
+    return column_number
 
 def get_column_number(
-    worksheet_obj, substring_str, header_row_int, worksheet_column_numbers_dict={}
-):
+    worksheet_obj: object, substring_str: str, header_row_int: int, worksheet_column_numbers_dict: dict = {}
+) -> int:
     # Returns column number or -1 if not found
     try:
         column_number = worksheet_column_numbers_dict[substring_str]
         print("Returned from try: on worksheet_column_numbers_dict")
-        return column_number
     except:
         if header_row_int == 0:
             column_header = worksheet_obj.Cells.Find(
@@ -192,8 +214,7 @@ def get_column_number(
         else:
             column_number = -1
 
-        return column_number
-
+    return column_number
 
 def get_last_column_range(worksheet_obj: object, header_row_int=0):
     if header_row_int > 0:
