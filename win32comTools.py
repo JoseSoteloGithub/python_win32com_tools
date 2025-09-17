@@ -682,12 +682,67 @@ def get_dict_li_from_key_relation(relation_destination_to_target_dict: dict, tar
 
     return return_list
 
-def message_box_and_sound(message: str, title: str) -> None:
-    import win32con
-    import win32api
+def message_box_and_sound(hwnd: int = 0, message: str = "", title: str = "", *styles: str) -> int:
+    """ 
+    Shows a message box with sound, returns the integer result of the button clicked
+    Arguments:
+        hwnd: int = 0, the handle to the owner window, 0 for none
+        message: str = "", the message to show
+        title: str = "", the title of the message box
+        styles: str = "", additional styles for the message box as strings, examples:
+            "ok" - OK button only
+            "okcancel" - OK and Cancel buttons
+            "yesno" - Yes and No buttons
+            "yesnocancel" - Yes, No, and Cancel buttons
+            "retrycancel" - Retry and Cancel buttons
+            "abortretryignore" - Abort, Retry, and Ignore buttons
+            "defbutton1" - Default button 1
+            "defbutton2" - Default button 2
+            "defbutton3" - Default button 3
+            "iconerror" - Error icon
+            "iconexclamation" - Exclamation icon
+            "iconinformation" - Information icon
+            "iconquestion" - Question icon
+    Returns:
+        int: The integer result of the button clicked
+        Possible return values:        
+        1, IDOK, The OK button was selected.
+        2, IDCANCEL, The Cancel button was selected.
+        3, IDABORT, The Abort button was selected.
+        4, IDRETRY, The Retry button was selected.
+        5, IDIGNORE, The Ignore button was selected.
+        6, IDYES, The Yes button was selected.
+        7, IDNO, The No button was selected.
+        10, IDTRYAGAIN, The Try Again button was selected.
+        11, IDCONTINUE, The Continue button was selected.
+    """
+
+    # Map style strings to win32con constants
+    style_map = {
+        "ok": win32con.MB_OK,
+        "okcancel": win32con.MB_OKCANCEL,
+        "yesno": win32con.MB_YESNO,
+        "yesnocancel": win32con.MB_YESNOCANCEL,
+        "retrycancel": win32con.MB_RETRYCANCEL,
+        "abortretryignore": win32con.MB_ABORTRETRYIGNORE,
+        "defbutton1": win32con.MB_DEFBUTTON1,
+        "defbutton2": win32con.MB_DEFBUTTON2,
+        "defbutton3": win32con.MB_DEFBUTTON3,
+        "iconerror": win32con.MB_ICONERROR,
+        "iconexclamation": win32con.MB_ICONEXCLAMATION,
+        "iconinformation": win32con.MB_ICONINFORMATION,
+        "iconquestion": win32con.MB_ICONQUESTION
+    }
+
+    arguments = 0
+    for style in styles:
+        if style.lower() in style_map:
+            arguments |= style_map[style.lower()]
 
     win32api.MessageBeep(win32con.MB_ICONEXCLAMATION)
-    win32api.MessageBox(0, message, title)
+    message_box = win32api.MessageBox(hwnd, message, title, arguments)
+
+    return message_box
 
 def bin_sort_pack(items, bin_sizes):
     # Solution dictionary
