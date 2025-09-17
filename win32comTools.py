@@ -1,6 +1,7 @@
 import sys
 import win32com.client
 import win32api
+import win32con
 
 constants = win32com.client.constants
 
