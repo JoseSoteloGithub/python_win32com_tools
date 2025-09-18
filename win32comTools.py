@@ -351,10 +351,9 @@ def show_all_data_from_sheet(ws: object) -> None:
         except Exception as this_exception:
             str_exception = str(this_exception)
             if 'ShowAllData method of Worksheet class failed' in str_exception:
-                alert_str = f'Error: ShowAllData method of Worksheet class failed.  Target Worksheet: {ws.Name}, Parent Workbook: {ws.Parent.Name}'
-                message_box_and_sound(alert_str, 'ERROR ON SHOW ALL DATA')
+                alert_str = f'Error: ShowAllData method of Worksheet class failed.\n\nTarget Worksheet: {ws.Name}\nParent Workbook: {ws.Parent.Name}'
+                message_box_and_sound(0, alert_str, 'ERROR ON SHOW ALL DATA', 'ok')
                 pass
-                # sys.exit(alert_str)
 
     return None
 
