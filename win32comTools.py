@@ -62,7 +62,7 @@ def handle_attribute_error_CLSIDToClassMap(attribute_error_str):
     second_section_index = attribute_error_str.find("'", first_section_index)
     folder_name = attribute_error_str[first_section_index:second_section_index]
     rmtree(f"{win32com.__gen_path__}\{folder_name}")
-    message_box_and_sound(f"AttributeError detected and path {win32com.__gen_path__}\{folder_name} has been removed.  Restart the program", "handle_attribute_error_CLSIDToClassMap")
+    message_box_and_sound(0, f"AttributeError detected and path {win32com.__gen_path__}\{folder_name} has been removed.  Restart the program", "handle_attribute_error_CLSIDToClassMap", "ok")
     sys.exit(
         f"AttributeError detected and path {win32com.__gen_path__}\{folder_name} has been removed.  Restart the program"
     )
@@ -489,12 +489,12 @@ def get_excel_session() -> object:
                 excel_session = win32com.client.gencache.EnsureDispatch('Excel.Application')
                 if "has no attribute 'CLSIDToClassMap'" in str(exception0):
                     # If the EnsureDispatch method fails, display an error message and handle the error
-                    message_box_and_sound(F"CLSIDToPackageMap Error.  Closing down.  Retry.\n{str(exception0)}", "ERROR DETECTED")
+                    message_box_and_sound(0, F"CLSIDToPackageMap Error.  Closing down.  Retry.\n{str(exception0)}", "ERROR DETECTED", "ok")
                     handle_attribute_error_CLSIDToClassMap(str(exception0))
                     return None
         if "has no attribute 'CLSIDToClassMap'" in str(exception):
             # If the original attempt to retrieve the application failed, display an error message and handle the error
-            message_box_and_sound(F"CLSIDToPackageMap Error.  Closing down.  Retry.\n{str(exception)}", "ERROR DETECTED")
+            message_box_and_sound(0, F"CLSIDToPackageMap Error.  Closing down.  Retry.\n{str(exception)}", "ERROR DETECTED", "ok")
             handle_attribute_error_CLSIDToClassMap(str(exception))
             return None
     try: 
@@ -505,7 +505,7 @@ def get_excel_session() -> object:
                 excel_session_workbook_len = len(excel_session.Workbooks)
             except Exception as exception0:
                 if "Excel.Application.Workbooks" in str(exception0):
-                    message_box_and_sound(f"AttributeError.  Unable to get len(excel_session.Workbooks).\nCtrl+Alt+Delete > Task Manager > Scroll Down to: Background Processes > close ghost Excel session\n{str(exception0)}",  "ERROR DETECTED")
+                    message_box_and_sound(0, f"AttributeError.  Unable to get len(excel_session.Workbooks).\nCtrl+Alt+Delete > Task Manager > Scroll Down to: Background Processes > close ghost Excel session\n{str(exception0)}",  "ERROR DETECTED", "ok")
                     return None
 
     try:
@@ -514,7 +514,7 @@ def get_excel_session() -> object:
         print(str(exception))
         if 'xlByRows' in str(exception):
             excel_session = win32com.client.gencache.EnsureDispatch('Excel.Application')
-            message_box_and_sound(f"AttributeError.  Unable to get constants.xlByRows.\nJust retry from the beginning, you don't have to close Excel\n{str(exception)}",  "ERROR DETECTED")
+            message_box_and_sound(0, f"AttributeError.  Unable to get constants.xlByRows.\nJust retry from the beginning, you don't have to close Excel\n{str(exception)}",  "ERROR DETECTED", "ok")
 
     return excel_session
 
