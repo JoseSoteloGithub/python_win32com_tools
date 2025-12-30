@@ -3,8 +3,32 @@ import win32com.client
 import win32api
 import win32con
 
-constants = win32com.client.constants
+def get_constants():
+    try:
+        # Get win32com constants
+        constants = win32com.client.constants
+        # test if xlByRows is part of constants
+        test_xlbyrows = constants.xlByRows
+        return win32com.client.constants
+    except AttributeError:
+        class FallbackConstants:
+            xlByRows = 1
+            xlByColumns = 2
+            xlPrevious = 2
+            xlNext = 1
+            xlUp = -4162
+            xlDown = -4121
+            xlToLeft = -4159
+            xlToRight = -4161
+            xlWhole = 1
+            xlPart = 2
+            xlFormulas = -4123
+            xlValues = -4163
+            xlCalculationAutomatic = -4105
+            xlCalculationManual = -4135
+        return FallbackConstants()
 
+constants = get_constants()
 
 class TableInWorksheet:
     def __init__(
